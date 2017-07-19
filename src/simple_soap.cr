@@ -6,12 +6,14 @@ class SimpleSoap
   getter host : String
   getter path : String
   getter port : Int32
+  getter ssl : Bool
+  getter insecure : Bool
   getter read_timeout : Int32
   getter connect_timeout : Int32
 
   @http : HTTP::Client?
 
-  def initialize(@host, @port, @path, @cookie = nil, @read_timeout = 1000000, @connect_timeout = 60)
+  def initialize(@host, @port, @path, @ssl = true, @insecure = false, @cookie = nil, @read_timeout = 1000000, @connect_timeout = 60)
     @http = nil
     restart_http
   end
@@ -32,8 +34,18 @@ class SimpleSoap
       puts ex.backtrace.join("\n")
     end
 
-    context = OpenSSL::SSL::Context::Client.insecure
-    new_http = HTTP::Client.new(host, port, context)
+    tls = if ssl
+            if insecure
+              OpenSSL::SSL::Context::Client.insecure
+            else
+              # TODO: set certificate and key
+              OpenSSL::SSL::Context::Client.new
+            end
+          else
+            false
+          end
+
+    new_http = HTTP::Client.new(host, port, tls)
     new_http.read_timeout = read_timeout
     new_http.connect_timeout = connect_timeout
 
