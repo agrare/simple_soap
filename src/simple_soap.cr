@@ -1,7 +1,7 @@
 require "./simple_soap/*"
 
 class SimpleSoap
-  def self.soap_envelope(header_proc = nil)
+  def self.soap_envelope(header_proc : Proc(XML::Builder, Void)? = nil)
     namespaces = {
       "xmlns:xsd" => "http://www.w3.org/2001/XMLSchema",
       "xmlns:env" => "http://schemas.xmlsoap.org/soap/envelope/",
@@ -23,13 +23,13 @@ class SimpleSoap
     end
   end
 
-  def self.request(client, path, action, body, cookie = nil)
+  def self.request(client : HTTP::Client, url : String | URI, action : String, body : HTTP::Client::BodyType, cookie : String? = nil)
     headers = HTTP::Headers.new
     headers["content-type"] = "text/xml; charset=utf-8"
     headers["SOAPAction"] = action
     headers["cookie"] = cookie if cookie
 
-    response = client.post(path, headers, body)
+    response = client.post(url, headers, body)
     raise "HTTP Error" if response.status_code != 200
 
     xml = XML.parse(response.body)
