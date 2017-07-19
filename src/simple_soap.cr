@@ -77,9 +77,7 @@ class SimpleSoap
       raise ex
     end
 
-    #if response.is_a? Net::HTTPServiceUnavailable
-    #  raise "Got HTTP 503: Service unavailable"
-    #end
+    raise "Got HTTP 503: Service unavailable" if response.status_code == 503
 
     self.cookie = response.headers["set-cookie"] if response.headers.has_key?("set-cookie")
 
