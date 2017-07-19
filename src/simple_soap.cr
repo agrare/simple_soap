@@ -70,16 +70,12 @@ class SimpleSoap
       headers["cookie"] = cookie
     end
 
-    start_time = Time.now
-
     begin
       response = http.post(path, headers, body)
     rescue ex
       restart_http
       raise ex
     end
-
-    end_time = Time.now
 
     #if response.is_a? Net::HTTPServiceUnavailable
     #  raise "Got HTTP 503: Service unavailable"
