@@ -1,15 +1,15 @@
 require "./simple_soap/*"
 
-class SimpleSoap
-  def self.soap_envelope(header_proc : Proc(XML::Builder, Void)? = nil)
-    namespaces = {
-      "xmlns:xsd" => "http://www.w3.org/2001/XMLSchema",
-      "xmlns:env" => "http://schemas.xmlsoap.org/soap/envelope/",
-      "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance"
-    }
+module SimpleSoap
+  NAMESPACES = {
+    "xmlns:xsd" => "http://www.w3.org/2001/XMLSchema",
+    "xmlns:env" => "http://schemas.xmlsoap.org/soap/envelope/",
+    "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+  }
 
+  def self.envelope(header_proc : Proc(XML::Builder, Void)? = nil)
     XML.build do |xml|
-      xml.element("env:Envelope", namespaces) do
+      xml.element("env:Envelope", NAMESPACES) do
         if header_proc
           xml.element("env:Header") do
             header_proc.call(xml)
@@ -33,7 +33,7 @@ class SimpleSoap
     raise "HTTP Error" if response.status_code != 200
 
     xml = XML.parse(response.body)
-    node = xml.xpath_node("//soapenv:Body/*", {"soapenv" => "http://schemas.xmlsoap.org/soap/envelope/"})
+    node = xml.xpath_node("//soapenv:Body/*", {"soapenv" => NAMESPACES["xmlns:env"]})
     raise "Invalid Soap Response" if node.nil?
 
     {node, response}
