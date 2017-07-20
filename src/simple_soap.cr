@@ -34,6 +34,7 @@ class SimpleSoap
 
     xml = XML.parse(response.body)
     node = xml.xpath_node("//soapenv:Body/*", {"soapenv" => "http://schemas.xmlsoap.org/soap/envelope/"})
+    raise "Invalid Soap Response" if node.nil?
 
     {node, response}
   end
