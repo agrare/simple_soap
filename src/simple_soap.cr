@@ -23,13 +23,13 @@ class SimpleSoap
     end
   end
 
-  def self.request(client : HTTP::Client, url : String | URI, action : String, body : HTTP::Client::BodyType, cookie : String? = nil)
+  def self.request(client : HTTP::Client, path, action : String, body : HTTP::Client::BodyType, cookie : String? = nil)
     headers = HTTP::Headers.new
     headers["content-type"] = "text/xml; charset=utf-8"
     headers["SOAPAction"] = action
     headers["cookie"] = cookie if cookie
 
-    response = client.post(url, headers, body)
+    response = client.post(path, headers, body)
     raise "HTTP Error" if response.status_code != 200
 
     xml = XML.parse(response.body)
